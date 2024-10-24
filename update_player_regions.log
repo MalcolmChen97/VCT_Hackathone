@@ -1,0 +1,17 @@
+2024-10-20 15:33:07,139:ERROR:Error reading league, player, tournament, and mapping data: [Errno 2] No such file or directory: 'vct-international/esports-data/league.json'
+2024-10-20 15:38:49,701:ERROR:Error reading league, player, tournament, and mapping data: [Errno 2] No such file or directory: 'vct-international/esports-data/league.json'
+2024-10-20 15:41:01,790:ERROR:Error reading league, player, tournament, and mapping data: [Errno 2] No such file or directory: 'vct-international/esports-data/league.json'
+2024-10-20 15:41:45,729:ERROR:Error reading league, player, tournament, and mapping data: [Errno 2] No such file or directory: 'vct-international/esports-data/league.json'
+2024-10-20 15:42:03,752:ERROR:Error reading league, player, tournament, and mapping data: [Errno 2] No such file or directory: 'vct-international/esports-data/league.json'
+2024-10-20 15:42:25,520:ERROR:Error reading league, player, tournament, and mapping data: list indices must be integers or slices, not str
+2024-10-20 15:43:28,309:ERROR:Error updating player regions in CSV: list indices must be integers or slices, not str
+2024-10-20 15:44:54,263:ERROR:Error reading league, player, tournament, and mapping data: [Errno 2] No such file or directory: 'vct-international/esports-data/league.json'
+2024-10-20 15:45:05,963:ERROR:Error reading league, player, tournament, and mapping data: list indices must be integers or slices, not str
+2024-10-20 15:46:10,177:ERROR:Error reading league, player, tournament, and mapping data: list indices must be integers or slices, not str
+2024-10-20 15:46:32,587:ERROR:Error reading league, player, tournament, and mapping data: list indices must be integers or slices, not str
+2024-10-20 15:46:44,515:ERROR:Error reading league, player, tournament, and mapping data: list indices must be integers or slices, not str
+2024-10-20 15:47:20,830:ERROR:Error reading league, player, tournament, and mapping data: list indices must be integers or slices, not str
+2024-10-20 15:47:25,822:ERROR:Error reading league, player, tournament, and mapping data: list indices must be integers or slices, not str
+2024-10-20 15:47:43,832:ERROR:Error reading league, player, tournament, and mapping data: list indices must be integers or slices, not str
+2024-10-20 15:49:21,099:ERROR:Error reading league, player, tournament, and mapping data: list indices must be integers or slices, not str
+2024-10-20 15:50:27,912:ERROR:Error reading league, player, tournament, and mapping data: [Errno 2] No such file or directory: 'vct-international/esports-data/league.json'

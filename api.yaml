@@ -1,0 +1,452 @@
+openapi: 3.0.0
+info:
+  title: Valorant Team Generation API
+  version: 1.0.0
+  description: |
+    This API generates a Valorant team based on specified constraints. Users can define various constraints such as league participation, regional diversity, specific player inclusion, and more. If no constraints are provided, the API selects the top five strongest players regardless of any limitations. The API returns a list of players with detailed information for analysis, including assigned roles, performance statistics, past teams, recent match results, and more.
+
+paths:
+  /team:
+    post:
+      summary: Generate a Valorant team based on constraints
+      description: |
+        This endpoint generates a team of Valorant players that meet the specified constraints provided in the request body. Constraints are optional; if none are provided, the API will select the top five strongest players without any limitations. The response contains detailed information about each player in the team, allowing for in-depth analysis and reasoning.
+
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConstraintsRequest'
+
+      responses:
+        '200':
+          description: |
+            Successful team generation. The response includes a list of players who have been selected to form a team based on the provided constraints or, if no constraints were given, the top five strongest players. Each player's information encompasses personal details, assigned roles, performance statistics, past team affiliations, recent match results, and more.
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamResponse'
+
+        '400':
+          description: |
+            Bad request or unable to generate a team that satisfies the given constraints. This could be due to invalid input data or overly restrictive constraints that make team generation impossible.
+
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ConstraintsRequest:
+      type: object
+      description: |
+        The request body containing the constraints for team generation. Constraints are optional. Users can specify league participation requirements, regional diversity, and specific players to include in the team.
+
+      properties:
+        constraints:
+          $ref: '#/components/schemas/Constraints'
+
+      example:
+        constraints:
+          league:
+            vct-international:
+              exact: 5
+          region:
+            diversity: 3
+          player:
+            - bangNA
+
+    Constraints:
+      type: object
+      description: |
+        Constraints for team generation. All fields are optional. If no constraints are provided, the API will select the top five strongest players.
+
+      properties:
+        league:
+          type: object
+          description: |
+            Constraints related to player leagues. Users can specify minimum, maximum, or exact numbers of players from specific leagues. This allows for fine-grained control over the league composition of the generated team.
+
+          additionalProperties:
+            type: object
+            properties:
+              min:
+                type: integer
+                description: |
+                  The minimum number of players required from this league. Must be a non-negative integer not exceeding 5.
+
+                minimum: 0
+                maximum: 5
+
+              max:
+                type: integer
+                description: |
+                  The maximum number of players allowed from this league. Must be a non-negative integer not exceeding 5.
+
+                minimum: 0
+                maximum: 5
+
+            oneOf:
+              - required: ['min']
+              - required: ['max']
+
+        region:
+          type: object
+          description: |
+            Constraints related to player regions. Users can enforce regional diversity or specify particular regions to include players from.
+
+          properties:
+            diversity:
+              type: integer
+              description: |
+                The minimum number of different regions that must be represented in the team. Must be at least 1 and not exceed 5.
+
+              minimum: 1
+              maximum: 5
+
+            region_list:
+              type: array
+              description: |
+                A list of specific regions from which players must be selected. Each region must be specified as a string.
+
+              items:
+                type: string
+                description: |
+                  The name of a region. Possible values include 'North America', 'Europe', 'Asia', 'South America', 'Oceania', 'Africa', and others as defined in the game.
+
+              minItems: 1
+
+        player:
+          type: array
+          description: |
+            A list of specific player handles that must be included in the team.
+
+          items:
+            type: string
+            description: |
+              The in-game handle or identifier of a player to include in the team.
+
+          minItems: 1
+
+    TeamResponse:
+      type: object
+      required:
+        - team
+      properties:
+        team:
+          type: array
+          description: |
+            The list of players that make up the generated team. Each player object contains comprehensive information, including personal details, assigned roles, performance statistics, past team history, recent match results, latest news, agent specialization, and more.
+
+          items:
+            $ref: '#/components/schemas/Player'
+
+      example:
+        team:
+          - player_id: "108058716084404104"
+            handle: "KenzmPs"
+            name: "Kenzo Mendes"
+            nationality: "Portugal"
+            current_region: "EMEA"
+            previous_regions:
+              - "EMEA"
+            league: "vct-international"
+            roles:
+              - "Initiator"
+              - "Controller"
+              - "Sentinel"
+            assigned_role: "Initiator"
+            acs: 210.5
+            kd_ratio: 1.65
+            assist_score: 0.65
+            map_awareness: 0.08
+            team_survival_trade_efficiency: 0.77
+            adr: 129.8
+            clutch_factor: 0.0
+            role_versatility: 3
+            agent_specialization:
+              breach: 2366
+              sova: 993
+              skye: 800
+              omen: 318
+              sage: 263
+              fade: 221
+              harbor: 167
+              kayo: 57
+              gekko: 57
+              killjoy: 37
+              astra: 37
+              viper: 24
+            past_teams:
+              - team_name: "AROS"
+                period: ""
+              - team_name: "VIKINGS Fourteen"
+                period: "January 2023 – April 2023"
+              - team_name: "Old Times"
+                period: ""
+              - team_name: "Team Vikings"
+                period: "March 2022 – June 2022"
+              - team_name: "FTW Esports"
+                period: "November 2020 – November 2021"
+            recent_match_result: '{"title": "Ramboot Club vs Barça eSports (final, Bo1)", "result": {"Ramboot Club": 0, "Barça eSports": 1}, "date": "Sunday, June 16th", "time": "12:00 PM PDT", "event": "Challengers League 2024 Spain Rising: Split 2 - Regular Season: Round 13"}'
+            latest_news: '[{"title": "Team Vitality, Keyd Stars, Version1 - News Almost Missed June 10", "time": "2022/06/09", "url": "https://www.vlr.gg/106853/team-vitality-keyd-stars-version1-news-almost-missed-june-10"}, {"title": "TENSTAR, Futbolist, Team Liquid - News Almost Missed June 3", "time": "2022/06/03", "url": "https://www.vlr.gg/105189/tenstar-futbolist-team-liquid-news-almost-missed-june-3"}, {"title": "MIBR, F4Q, FunPlus Phoenix - News Almost Missed April 1", "time": "2022/04/01", "url": "https://www.vlr.gg/84043/mibr-f4q-funplus-phoenix-news-almost-missed-april-1"}]'
+          # Additional players...
+
+    Player:
+      type: object
+      required:
+        - player_id
+        - handle
+        - league
+        - roles
+        - assigned_role
+      properties:
+        player_id:
+          type: string
+          description: |
+            A unique identifier for the player within the system. This ID is used to distinguish between players and should remain consistent across API calls.
+
+        handle:
+          type: string
+          description: |
+            The in-game handle or username of the player. This is how the player is known within the Valorant community and is used to identify them in matches.
+
+        name:
+          type: string
+          description: |
+            The real name of the player. This provides a personal touch and may be used in professional settings or broadcasts.
+
+        nationality:
+          type: string
+          description: |
+            The country of origin or citizenship of the player. This can be used to assess cultural and linguistic compatibility within the team.
+
+        current_region:
+          type: string
+          description: |
+            The geographical region where the player is currently competing. Possible values include regions recognized in the competitive scene, such as 'North America', 'Europe', 'Asia', 'South America', 'Oceania', 'Africa', etc.
+
+        previous_regions:
+          type: array
+          description: |
+            A list of regions where the player has previously competed. This information provides insight into the player's international experience and adaptability to different competitive environments.
+
+          items:
+            type: string
+            description: |
+              The name of a region. Possible values include 'North America', 'Europe', 'Asia', 'South America', 'Oceania', 'Africa', etc.
+
+          minItems: 0
+
+        league:
+          type: string
+          description: |
+            The current league or tier in which the player is competing. This indicates the level of competition they are accustomed to.
+
+          enum:
+            - vct-international
+            - vct-challengers
+            - game-changers
+            - other
+
+        roles:
+          type: array
+          description: |
+            A list of roles that the player is proficient in. This reflects their versatility and preferred playstyles.
+
+          items:
+            type: string
+            enum:
+              - Duelist
+              - Initiator
+              - Controller
+              - Sentinel
+
+          minItems: 1
+
+        assigned_role:
+          type: string
+          description: |
+            The role assigned to the player in the generated team. This is based on the team's needs and the player's proficiencies.
+
+          enum:
+            - Duelist
+            - Initiator
+            - Controller
+            - Sentinel
+            - Flex
+
+        acs:
+          type: number
+          format: float
+          description: |
+            Average Combat Score (ACS) of the player. This is a performance metric representing their average impact in matches, including kills, assists, and objective contributions.
+
+          minimum: 0
+
+        kd_ratio:
+          type: number
+          format: float
+          description: |
+            Kill-to-death ratio of the player. A higher value indicates more kills per death, reflecting combat effectiveness.
+
+          minimum: 0
+
+        assist_score:
+          type: number
+          format: float
+          description: |
+            A metric representing the player's contribution through assists. This includes utility usage and support play that leads to team success.
+
+          minimum: 0
+
+        map_awareness:
+          type: number
+          format: float
+          description: |
+            An evaluation of the player's understanding of map dynamics, positioning, and rotations. A higher score indicates superior strategic awareness.
+
+          minimum: 0
+          maximum: 1
+
+        team_survival_trade_efficiency:
+          type: number
+          format: float
+          description: |
+            A measure of how effectively the player contributes to team survival and trades. It reflects their ability to secure advantageous exchanges and keep teammates alive.
+
+          minimum: 0
+          maximum: 1
+
+        adr:
+          type: number
+          format: float
+          description: |
+            Average Damage per Round (ADR). This metric indicates the player's average damage output per round, showcasing their offensive impact.
+
+          minimum: 0
+
+        clutch_factor:
+          type: number
+          format: float
+          description: |
+            A metric indicating the player's ability to perform in high-pressure situations, such as clutching rounds when outnumbered.
+
+          minimum: 0
+          maximum: 1
+
+        role_versatility:
+          type: integer
+          description: |
+            A numerical value representing the number of roles the player is proficient in. This indicates the player's flexibility and adaptability within a team.
+
+          minimum: 1
+          maximum: 4
+
+        agent_specialization:
+          type: object
+          description: |
+            An object representing the player's experience with specific agents in the game. Each key is the name of an agent, and the value is a numerical score indicating the level of specialization or number of times the agent has been played.
+
+          additionalProperties:
+            type: integer
+            description: |
+              The player's experience score with the agent. A higher number indicates greater experience.
+
+          example:
+            breach: 2366
+            sova: 993
+            skye: 800
+            omen: 318
+            sage: 263
+            fade: 221
+            harbor: 167
+            kayo: 57
+            gekko: 57
+            killjoy: 37
+            astra: 37
+            viper: 24
+
+        past_teams:
+          type: array
+          description: |
+            A history of the player's previous team affiliations. This provides context on their experience, teamwork, and career progression.
+
+          items:
+            type: object
+            properties:
+              team_name:
+                type: string
+                description: |
+                  The name of the previous team the player was part of.
+
+              period:
+                type: string
+                description: |
+                  The period during which the player was with the team, typically in 'Month Year – Month Year' format.
+
+            required:
+              - team_name
+              - period
+
+          minItems: 0
+
+        recent_match_result:
+          type: string
+          description: |
+            A JSON string containing details about the player's most recent match result. This includes the match title, result, date, time, and event information. The structure of the JSON string is as follows:
+
+            ```json
+            {
+              "title": "Match Title",
+              "result": {
+                "Team A": ScoreA,
+                "Team B": ScoreB
+              },
+              "date": "Match Date",
+              "time": "Match Time",
+              "event": "Event Name"
+            }
+            ```
+
+            This detailed information provides insight into the player's recent performance and competitive activity.
+
+          example: |
+            '{"title": "Ramboot Club vs Barça eSports (final, Bo1)", "result": {"Ramboot Club": 0, "Barça eSports": 1}, "date": "Sunday, June 16th", "time": "12:00 PM PDT", "event": "Challengers League 2024 Spain Rising: Split 2 - Regular Season: Round 13"}'
+
+        latest_news:
+          type: string
+          description: |
+            A JSON string containing an array of the latest news articles related to the player. Each article includes a title, publication time, and URL. The structure of the JSON string is as follows:
+
+            ```json
+            [
+              {
+                "title": "Article Title",
+                "time": "Publication Date",
+                "url": "Article URL"
+              },
+              // Additional articles...
+            ]
+            ```
+
+            This information keeps users updated on recent developments involving the player.
+
+          example: |
+            '[{"title": "Team Vitality, Keyd Stars, Version1 - News Almost Missed June 10", "time": "2022/06/09", "url": "https://www.vlr.gg/106853/team-vitality-keyd-stars-version1-news-almost-missed-june-10"}, {"title": "TENSTAR, Futbolist, Team Liquid - News Almost Missed June 3", "time": "2022/06/03", "url": "https://www.vlr.gg/105189/tenstar-futbolist-team-liquid-news-almost-missed-june-3"}, {"title": "MIBR, F4Q, FunPlus Phoenix - News Almost Missed April 1", "time": "2022/04/01", "url": "https://www.vlr.gg/84043/mibr-f4q-funplus-phoenix-news-almost-missed-april-1"}]'
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: |
+            A descriptive error message explaining why the request failed. This helps users understand the issue, whether it's due to invalid input, conflicting constraints, or internal server errors.
+
+      example:
+        error: "Could not find a suitable team with the given constraints."
